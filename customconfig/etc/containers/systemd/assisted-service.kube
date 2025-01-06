@@ -1,0 +1,12 @@
+[Unit]
+Description=Assisted Installer Deployment
+After=network-online.target kiwi_containers.service
+Wants=network-online.target
+
+[Kube]
+Yaml=/root/assisted-service/pod.yml
+ConfigMap=/root/assisted-service/configmap.yml
+
+[Install]
+# Start by default on boot
+WantedBy=multi-user.target default.target

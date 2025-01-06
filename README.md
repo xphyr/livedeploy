@@ -13,6 +13,25 @@ Supply local mirror registry if required
 
 ## Building CD
 
+### Generate login password:
+
+```
+openssl passwd -1 -salt xyz PASSWORD
+```
+
+The example file uses "PASSWORD" as the password. This should be changed.
+
+### Creating config tar file
+
+```
+tar -C customconfig -cvf ocpdeployimage/config-files.tar .
+```
+
+# kiwi does not work with SELinux ... so we need to disable it for the build process to work
+sudo senforcing 0
+sudo kiwi-ng --profile=Live system build --description=ocpdeployimage/ --target-dir=/u01/kiwi/ 
+```
+
 ## Deploying a Cluster with the CD
 
 ## Projects Used
@@ -23,3 +42,29 @@ Supply local mirror registry if required
 - FireFox - should start automatically and bring up the assisted service UI
 - OpenShift
 - Pulp - https://pulpproject.org/pulp-oci-images/docs/admin/tutorials/quickstart/#single-container  (need to see if this will work or not)
+- Kiwi - https://osinside.github.io/kiwi/index.html
+- OSBuild - https://osbuild.org
+
+
+
+
+#### Temp notes
+
+```
+$ sudo dnf install osbuild-composer composer-cli
+
+Note that composer-cli is a virtual provides for the actual package name, which is weldr-client for historical reasons.
+
+To enable the service, run this command:
+
+$ sudo systemctl enable --now osbuild-composer.socket
+
+Verify that the installation works by running composer-cli:
+
+$ sudo composer-cli status show
+
+If you prefer to run this command without sudo privileges, add your user to the weldr group:
+
+$ sudo usermod -a -G weldr <user>
+$ newgrp weldr
+```

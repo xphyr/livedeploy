@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- The line below is required in order to use the multibuild OBS features -->
+<!-- OBS-Profiles: @BUILD_FLAVOR@ -->
+
+<image schemaversion="7.5" name="ocpdeployimage">
+    <description type="system">
+        <author>Mark DeNeve</author>
+        <contact>mdeneve@redhat.com</contact>
+        <specification>Fedora Appliance for Deploying OCP</specification>
+    </description>
+    <profiles>
+        <profile name="Live" description="Live image of Fedora"/>
+        <profile name="Virtual" description="Virtual image of Fedora"/>
+        <profile name="Disk" description="OEM image of Fedora"/>
+    </profiles>
+	<preferences>
+		<version>41</version>
+		<packagemanager>dnf5</packagemanager>
+		<locale>en_US</locale>
+		<keytable>us</keytable>
+		<timezone>UTC</timezone>
+		<release-version>41</release-version>
+	</preferences>
+    <preferences profiles="Live">
+        <type image="iso" flags="overlay" firmware="uefi" hybridpersistent_filesystem="ext4" hybridpersistent="true" kernelcmdline="console=ttyS0">
+            <bootloader name="grub2" console="serial" timeout="10"/>
+        </type>
+    </preferences>
+    <preferences profiles="Virtual">
+        <type image="oem" filesystem="btrfs" kernelcmdline="console=ttyS0" firmware="uefi" format="qcow2" btrfs_root_is_subvolume="true" btrfs_set_default_volume="false" rootfs_label="fedora" bootpartition="true" bootfilesystem="ext4">
+            <systemdisk name="fedora">
+                <volume name="@root=root"/>
+                <volume name="home" parent="/"/>
+                <volume name="var" parent="/"/>
+            </systemdisk>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+            <bootloader name="grub2" console="serial" timeout="10"/>
+        </type>
+    </preferences>
+    <preferences profiles="Disk">
+        <type image="oem" filesystem="ext4" installiso="true" installboot="install" firmware="uefi" kernelcmdline="console=ttyS0">
+            <bootloader name="grub2" console="serial" timeout="10"/>
+            <oemconfig>
+                <oem-systemsize>2048</oem-systemsize>
+                <oem-unattended>true</oem-unattended>
+                <oem-swap>true</oem-swap>
+                <oem-swapsize>200</oem-swapsize>
+                <oem-multipath-scan>false</oem-multipath-scan>
+            </oemconfig>
+        </type>
+    </preferences>
+    <users>
+        <user password="$1$xyz$dgp1PAUiYclT7SvZ04fWd0" home="/root" name="root" groups="root"/>
+    </users>
+    <repository type="rpm-md" alias="fedora" sourcetype="metalink">
+		<source path="https://mirrors.fedoraproject.org/metalink?repo=fedora-$releasever&amp;arch=$basearch">
+			<signing key="file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-$releasever-primary"/>
+		</source>
+	</repository>
+	<repository type="rpm-md" alias="updates" sourcetype="metalink">
+		<source path="https://mirrors.fedoraproject.org/metalink?repo=updates-released-f$releasever&amp;arch=$basearch">
+			<signing key="file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-$releasever-primary"/>
+		</source>
+	</repository>
+    <packages type="image">
+        <package name="grub2"/>
+        <package name="grubby"/>
+        <package name="kernel"/>
+        <package name="plymouth-theme-charge"/>
+        <package name="grub2-breeze-theme"/>
+        <package name="selinux-policy-targeted"/>
+        <package name="dhclient"/>
+        <package name="glibc-all-langpacks"/>
+        <package name="vim"/>
+        <package name="tzdata"/>
+        <package name="NetworkManager"/>
+        <package name="btrfs-progs"/>
+        <package name="podman"/>
+        <package name="skopeo"/>
+        <package name="fuse-overlayfs"/>
+        <archive name="config-files.tar"/>
+    </packages>
+    <packages type="image" profiles="Live">
+        <package name="dracut-kiwi-live"/>
+    </packages>
+    <packages type="image" profiles="Disk">
+        <package name="dracut-kiwi-oem-repart"/>
+        <package name="dracut-kiwi-oem-dump"/>
+    </packages>
+    <packages type="bootstrap">
+        <package name="filesystem"/>
+        <package name="basesystem"/>
+        <package name="grub2-efi-x64-modules"/>
+        <package name="grub2-efi-x64"/>
+        <package name="shim" arch="x86_64"/>
+        <package name="fedora-release"/>
+    </packages>
+    <containers source="quay.io" backend="podman" profiles="Live">
+        <container name="postgresql-12-c8s" path="/sclorg" tag="latest"/>
+        <container name="assisted-installer-ui" path="edge-infrastructure" tag="latest"/>
+        <container name="assisted-image-service" path="edge-infrastructure" tag="latest"/>
+        <container name="assisted-service" path="edge-infrastructure" tag="latest"/>
+    </containers>
+    <containers source="docker.io" backend="podman" profiles="Live">
+        <container name="coredns" path="/coredns/" tag="latest" />
+    </containers>
+</image>
