@@ -1,0 +1,16 @@
+$TTL    604800
+@       IN      SOA     dns.demo.poc.     admin.demo.poc.   (
+        3       ;       Serial
+        604800  ;       Refresh
+        86400   ;       Retry
+        2419200 ;       Expire
+        604800  )       ;       Negative Cache TTL
+
+; Name Servers - NS Records
+@       IN      NS      dns
+; Name Servers - A records
+dns.demo.poc.     IN      A       127.0.0.2
+; OpenShift Cluster DNS Entries
+; api.ocp4.demo.poc. IN      A       <ip here>
+; 
+

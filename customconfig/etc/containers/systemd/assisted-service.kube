@@ -1,7 +1,8 @@
 [Unit]
 Description=Assisted Installer Deployment
-After=network-online.target kiwi_containers.service
+After=network-online.target kiwi_containers.service config-ip.service
 Wants=network-online.target
+Requires=config-ip.service
 
 [Kube]
 Yaml=/root/assisted-service/pod.yml

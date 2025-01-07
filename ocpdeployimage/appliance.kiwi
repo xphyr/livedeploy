@@ -81,6 +81,8 @@
         <package name="podman"/>
         <package name="skopeo"/>
         <package name="fuse-overlayfs"/>
+        <package name="bind-utils"/>
+        <package name="open-vm-tools" />
         <archive name="config-files.tar"/>
     </packages>
     <packages type="image" profiles="Live">

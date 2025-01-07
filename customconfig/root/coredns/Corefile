@@ -1,0 +1,11 @@
+.:53 {
+    forward . 8.8.8.8 9.9.9.9
+    log
+    errors
+}
+
+demo.poc:53 {
+    file /conf/demo-poc.db
+    log
+    errors
+}

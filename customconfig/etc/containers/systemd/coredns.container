@@ -1,0 +1,27 @@
+[Unit]
+Description=Run CoreDNS services
+After=network-online.target kiwi_containers.service config-ip.service
+Wants=network-online.target
+Requires=config-ip.service
+
+[Container]
+# Use the centos image
+Image=docker.io/coredns/coredns:latest
+
+# Use volume and network defined below
+Volume=/root/coredns/:/conf:z
+Network=host
+WorkingDir=/conf
+
+# Pass the configuration directory to the container
+Exec=-conf /conf/Corefile
+
+[Service]
+# Restart service when sleep finishes
+Restart=always
+# Extend Timeout to allow time to pull the image
+TimeoutStartSec=900
+
+[Install]
+# Start by default on boot
+WantedBy=multi-user.target default.target
